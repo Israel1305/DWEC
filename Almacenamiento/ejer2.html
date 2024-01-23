@@ -9,6 +9,7 @@
 
 </head>
 <body>
+    <h1>Bienvenidos</h1>
     <div id="productos">
         <div id="bienvenida" style="float: right; margin-right: 20px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"></div>
          
@@ -40,6 +41,7 @@
             <tbody id="carrito-body"></tbody>
         </table>
         <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+        <button onclick="comprar()">Comprar</button>
     </div>
 
     
@@ -75,8 +77,8 @@
         // Función para cerrar sesión
         function cerrarSesion() {
             // Eliminar las cookies
-            document.cookie = 'inicio_sesion=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'nombre_usuario=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'inicio_sesion=;';
+            document.cookie = 'nombre_usuario=;';
 
             // Redirigir a la página de inicio de sesión
             window.location.href = 'login.html';
@@ -90,7 +92,7 @@
         };
 
         function cargarCarrito() {
-            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
             const carritoBody = document.getElementById('carrito-body');
             carritoBody.innerHTML = '';
 
@@ -100,8 +102,30 @@
                     <td>${producto.nombre}</td>
                     <td>${producto.cantidad}</td>
                 `;
+                // evento clic para restar 1 a la cantidad al hacer clic en la fila del carrito
+                row.addEventListener('click', function () {
+                    restarCantidad(producto);
+                });
                 carritoBody.appendChild(row);
             });
+        }
+        function restarCantidad(producto) {
+            let carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
+            const productoEnCarrito = carrito.find(p => p.nombre === producto.nombre);
+
+            if (productoEnCarrito) {
+                // Verificar que la cantidad sea mayor que 1 antes de restar
+                if (productoEnCarrito.cantidad > 1) {
+                    productoEnCarrito.cantidad -= 1;
+                    sessionStorage.setItem('carrito', JSON.stringify(carrito));
+                    cargarCarrito(); // Actualizar la visualización del carrito
+                } else {
+                    // Si la cantidad es 1, eliminar el producto del carrito
+                    carrito = carrito.filter(p => p.nombre !== producto.nombre);
+                    sessionStorage.setItem('carrito', JSON.stringify(carrito));
+                    cargarCarrito(); // Actualizar la visualización del carrito
+                }
+            }
         }
 
         function cargarProductos() {
@@ -119,21 +143,39 @@
         }
 
         function agregarAlCarrito(producto) {
-            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-            const productoEnCarrito = carrito.find(p => p.nombre === producto.nombre);
+            // Hacer una solicitud para cargar el contenido del archivo productos.json
+            fetch('./productos.json')
+                .then(response => response.json())
+                .then(data => {
+                    const cantidadDisponible = data.find(p => p.nombre === producto.nombre).cantidad;
 
-            if (productoEnCarrito) {
-                productoEnCarrito.cantidad += 1;
-            } else {
-                carrito.push({ nombre: producto.nombre, cantidad: 1 });
-            }
+                    let carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
+                    const productoEnCarrito = carrito.find(p => p.nombre === producto.nombre);
 
-            localStorage.setItem('carrito', JSON.stringify(carrito));
-            cargarCarrito(); // Actualizar la visualización del carrito
+                    if (productoEnCarrito) {
+                        if (productoEnCarrito.cantidad < cantidadDisponible) {
+                            productoEnCarrito.cantidad += 1;
+                            sessionStorage.setItem('carrito', JSON.stringify(carrito));
+                            cargarCarrito(); // Actualizar la visualización del carrito
+                        } else {
+                            alert('¡No hay más stock disponible para este producto!');
+                        }
+                    } else {
+                        if (cantidadDisponible > 0) {
+                            carrito.push({ nombre: producto.nombre, cantidad: 1 });
+                            sessionStorage.setItem('carrito', JSON.stringify(carrito));
+                            cargarCarrito(); // Actualizar la visualización del carrito
+                        } else {
+                            alert('¡No hay más stock disponible para este producto!');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error al cargar los productos:', error));
         }
 
+
         function vaciarCarrito() {
-            localStorage.removeItem('carrito');
+            sessionStorage.removeItem('carrito');
             location.reload();
         }
         function verProductosDisponibles() {
@@ -156,21 +198,45 @@
             .catch(error => console.error('Error al cargar los productos:', error));
         }
 
-        // Función para obtener la cantidad total de un producto en el carrito
-        function getCantidadTotalProductoEnCarrito(nombreProducto) {
-            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-            const productoEnCarrito = carrito.find(producto => producto.nombre === nombreProducto);
+        function comprar() {
+            // Obtener el carrito actual
+            const carrito = JSON.parse(sessionStorage.getItem('carrito')) || [];
 
-            return productoEnCarrito ? productoEnCarrito.cantidad : 0;
+            // Verificar la cantidad disponible para cada producto en el carrito
+            fetch('./productos.json')
+                .then(response => response.json())
+                .then(data => {
+                    let haySuficienteStock = true;
+
+                    carrito.forEach(productoEnCarrito => {
+                        const productoEnStock = data.find(p => p.nombre === productoEnCarrito.nombre);
+
+                        if (!productoEnStock || productoEnCarrito.cantidad > productoEnStock.cantidad) {
+                            alert(`¡No hay suficiente stock para ${productoEnCarrito.nombre}!`);
+                            haySuficienteStock = false;
+                        }
+                    });
+
+                    if (haySuficienteStock) {
+                        // Realizar la compra: restar la cantidad del stock
+                        carrito.forEach(productoEnCarrito => {
+                            const productoEnStock = data.find(p => p.nombre === productoEnCarrito.nombre);
+                            productoEnStock.cantidad -= productoEnCarrito.cantidad;
+                        });
+
+                        // Limpiar el carrito
+                        sessionStorage.removeItem('carrito');
+
+                        // Actualizar la visualización del carrito y de los productos disponibles
+                        cargarCarrito();
+                        verProductosDisponibles();
+                        
+                        alert('¡Compra realizada con éxito!');
+                    }
+                })
+                .catch(error => console.error('Error al cargar los productos:', error));
         }
 
-
-        // Ejemplo de uso: obtener la cantidad total de camisetas en el carrito
-        const nombreProducto = 'Camiseta';  // Reemplaza 'Camiseta' con el nombre real del producto
-        const cantidadEnCarrito = getCantidadTotalProductoEnCarrito(nombreProducto);
-
-
-        console.log(`Cantidad total de ${nombreProducto} en el carrito: ${cantidadEnCarrito}`);
 
     </script>
 
