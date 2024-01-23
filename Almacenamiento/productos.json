@@ -1,0 +1,13 @@
+[
+    {"nombre": "Camiseta", "cantidad": 5},
+    {"nombre": "Pantalón", "cantidad": 3},
+    {"nombre": "Zapatos", "cantidad": 2},
+    {"nombre": "Reloj", "cantidad": 1},
+    {"nombre": "Mochila", "cantidad": 4},
+    {"nombre": "Gafas de sol", "cantidad": 2},
+    {"nombre": "Libro", "cantidad": 6},
+    {"nombre": "Teléfono móvil", "cantidad": 1},
+    {"nombre": "Auriculares", "cantidad": 3},
+    {"nombre": "Bolígrafo", "cantidad": 10}
+  ]
+  

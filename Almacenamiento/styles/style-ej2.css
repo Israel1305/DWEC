@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /*overflow: hidden;*/
+    background-color: #f4f4f4;
+}
+#carrito, #productos {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    backdrop-filter: blur(10px);
+    color: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #4caf50;
+    color: white;
+}
+td {
+    backdrop-filter: blur(10px);
+    color: white;
+}
+button {
+    background-color: #4caf50;
+    color: white;
+    padding: 8px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+ul {
+    list-style: none;
+    padding: 0;
+}
+li {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+/**
+*
+* Login css
+*/
+
+.contenedor-form {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    color: white;
+    transform: translate(-50%, -50%);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    width: 40%;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+video {
+    z-index: -1;
+    background-size: cover;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+@media screen and (max-width: 768px) {
+    .contenedor-form {
+        width: 80%;
+        left: 50%;
+    }
+
+}

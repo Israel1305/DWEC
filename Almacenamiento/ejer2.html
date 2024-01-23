@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compra</title>
+    <link rel="stylesheet" href="./styles/style-ej2.css">
+    <link rel="icon" href="./media/shop-ico.svg" type="image/x-icon">
+
+</head>
+<body>
+    <div id="productos">
+        <div id="bienvenida" style="float: right; margin-right: 20px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;"></div>
+         
+        <h2>Productos Disponibles</h2>
+        <button onclick="verProductosDisponibles()">Ver Disponibles</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad Disponible</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <ul id="lista-productos"></ul>
+        
+       
+    </div>
+
+    <div id="carrito">
+           <h2>Carrito de Compra</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody id="carrito-body"></tbody>
+        </table>
+        <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+    </div>
+
+    
+    <video autoplay muted loop>
+        <source src="./media/bg_video.mp4" type="video/mp4">
+        Tu navegador no soporta el elemento de video.
+    </video>
+
+    <script>
+        /*******/
+         
+
+        // Función para obtener el valor de una cookie por nombre
+        function getCookie(name) {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf(name + '=') === 0) {
+                    return cookie.substring(name.length + 1);
+                }
+            }
+            return null;
+        }
+         // Verificar si existe la cookie 'nombre_usuario'
+         var nombreUsuario = getCookie('nombre_usuario');
+
+        if (nombreUsuario) {
+            // Mostrar el bloque de bienvenida
+            document.getElementById('bienvenida').innerHTML = 'Bienvenido, ' + nombreUsuario + ' | <a href="#" onclick="cerrarSesion()">Cerrar Sesión</a>';
+        }
+
+
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            // Eliminar las cookies
+            document.cookie = 'inicio_sesion=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'nombre_usuario=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+            // Redirigir a la página de inicio de sesión
+            window.location.href = 'login.html';
+        }
+        /*******/
+
+        // Cargar carrito y productos al iniciar la página
+        window.onload = function () {
+            cargarCarrito();
+            cargarProductos();
+        };
+
+        function cargarCarrito() {
+            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const carritoBody = document.getElementById('carrito-body');
+            carritoBody.innerHTML = '';
+
+            carrito.forEach(producto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${producto.nombre}</td>
+                    <td>${producto.cantidad}</td>
+                `;
+                carritoBody.appendChild(row);
+            });
+        }
+
+        function cargarProductos() {
+            const listaProductos = document.getElementById('lista-productos');
+            listaProductos.innerHTML = '';
+
+            productos.forEach(producto => {
+                const listItem = document.createElement('li');
+                listItem.textContent = producto.nombre;
+                listItem.addEventListener('click', function () {
+                    agregarAlCarrito(producto);
+                });
+                listaProductos.appendChild(listItem);
+            });
+        }
+
+        function agregarAlCarrito(producto) {
+            let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const productoEnCarrito = carrito.find(p => p.nombre === producto.nombre);
+
+            if (productoEnCarrito) {
+                productoEnCarrito.cantidad += 1;
+            } else {
+                carrito.push({ nombre: producto.nombre, cantidad: 1 });
+            }
+
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            cargarCarrito(); // Actualizar la visualización del carrito
+        }
+
+        function vaciarCarrito() {
+            localStorage.removeItem('carrito');
+            location.reload();
+        }
+        function verProductosDisponibles() {
+        // Hacer una solicitud para cargar el contenido del archivo productos.json
+        fetch('./productos.json')
+            .then(response => response.json())
+            .then(data => {
+                const listaProductos = document.getElementById('lista-productos');
+                listaProductos.innerHTML = '';
+
+                data.forEach(producto => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = producto.nombre;
+                    listItem.addEventListener('click', function () {
+                        agregarAlCarrito(producto);
+                    });
+                    listaProductos.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error al cargar los productos:', error));
+        }
+
+        // Función para obtener la cantidad total de un producto en el carrito
+        function getCantidadTotalProductoEnCarrito(nombreProducto) {
+            const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+            const productoEnCarrito = carrito.find(producto => producto.nombre === nombreProducto);
+
+            return productoEnCarrito ? productoEnCarrito.cantidad : 0;
+        }
+
+
+        // Ejemplo de uso: obtener la cantidad total de camisetas en el carrito
+        const nombreProducto = 'Camiseta';  // Reemplaza 'Camiseta' con el nombre real del producto
+        const cantidadEnCarrito = getCantidadTotalProductoEnCarrito(nombreProducto);
+
+
+        console.log(`Cantidad total de ${nombreProducto} en el carrito: ${cantidadEnCarrito}`);
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In</title>
+    <link rel="stylesheet" href="./styles/style-ej2.css">
+    <link rel="icon" href="./media/shop-ico.svg" type="image/x-icon">
+</head>
+<body>
+    
+
+   
+    <p id="mensaje_error" style="color: red;"></p>
+    <div class="contenedor-form">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <label for="usuario">Usuario:</label>
+            <input type="text" name="usuario" id="usuario" required>
+            <label for="contrasena">Contraseña:</label>
+            <input type="password" name="contrasena" id="contrasena" required>
+            <input type="submit" value="Iniciar Sesión">
+        </form>
+    </div>  
+    <video autoplay muted loop>
+        <source src="./media/bg_video.mp4" type="video/mp4">
+        Tu navegador no soporta el elemento de video.
+    </video>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var usuario = document.getElementById('usuario').value;
+            var contrasena = document.getElementById('contrasena').value;
+
+           if (usuario === 'Israel' && contrasena === 'israel') {
+                // Establecer cookies 
+                var expires = new Date();
+                expires.setTime(expires.getTime() + (7 * 24 * 3600 * 1000)); // 1 semana
+
+                document.cookie = 'inicio_sesion=pepe; expires=' + expires.toUTCString() + '; path=/';
+                document.cookie = 'nombre_usuario=' + usuario + '; expires=' + expires.toUTCString() + '; path=/';
+
+                // Redirigir a la página supermercado.php
+                window.location.href = 'ejer2.html';
+            } else {
+                // Mostrar mensaje de error
+                document.getElementById('mensaje_error').textContent = 'Credenciales incorrectas. Inténtalo de nuevo.';
+            }
+        });
+    </script>
+    
+</body>
+</html>

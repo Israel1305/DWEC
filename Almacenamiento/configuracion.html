@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #config-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="config-form">
+        <h2>Configuración</h2>
+        <form id="config-form">
+            <label for="backgroundColor">Color de fondo:</label>
+            <input type="color" id="backgroundColor" name="backgroundColor">
+
+            <label for="pageTitle">Título de la página:</label>
+            <input type="text" id="pageTitle" name="pageTitle">
+
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" id="username" name="username">
+
+            <button type="button" onclick="guardarConfiguracion()">Guardar Configuración</button>
+        </form>
+    </div>
+
+    <script>
+        function guardarConfiguracion() {
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const pageTitle = document.getElementById('pageTitle').value;
+            const username = document.getElementById('username').value;
+
+            // Crear fechas para la expiración (1 día)
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 1);
+
+            // Configurar cookies
+            document.cookie = `backgroundColor=${backgroundColor}; expires=${expirationDate.toUTCString()}`;
+            document.cookie = `pageTitle=${pageTitle}; expires=${expirationDate.toUTCString()}`;
+            document.cookie = `username=${username}; expires=${expirationDate.toUTCString()}`;
+
+            alert('Configuración guardada en cookies.');
+        }
+    </script>
+
+</body>
+</html>
